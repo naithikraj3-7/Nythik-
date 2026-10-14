@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TV Mouse</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 22px;
+  font-family: Arial, sans-serif;
+  background: #10131b; color: white;
+}
+h1 { text-align: center; }
+#status {
+  text-align: center; color: #f4c76b;
+  margin: 12px 0 20px;
+}
+#pad {
+  height: 330px; position: relative;
+  background: #202737; border: 1px solid #526078;
+  border-radius: 22px; touch-action: none;
+  display: flex; align-items: center;
+  justify-content: center; color: #aebbd0;
+  overflow: hidden;
+}
+#cursor {
+  position: absolute; font-size: 26px;
+  left: 50%; top: 50%; pointer-events: none;
+}
+.buttons {
+  display: flex; gap: 12px; margin-top: 16px;
+}
+button, input {
+  border: 0; border-radius: 12px;
+  padding: 16px; font-size: 16px;
+}
+button {
+  background: #34435d; color: white; flex: 1;
+}
+input { width: 100%; margin-top: 18px; }
+.small { color: #aebbd0; text-align: center; }
+</style>
+</head>
+<body>
+<h1>🖱️ TV Mouse</h1>
+<div id="status">● Demo mode — not connected to TV</div>
+
+<div id="pad">
+  <span>Swipe here to move</span>
+  <span id="cursor">➤</span>
+</div>
+
+<div class="buttons">
+  <button id="left">Left click</button>
+  <button id="right">Right click</button>
+</div>
+
+<div class="buttons">
+  <button id="back">↩ Back</button>
+  <button id="home">⌂ Home</button>
+</div>
+
+<input id="typing" placeholder="Type a message (demo only)">
+<p class="small" id="message">
+  Ready to test your touchpad.
+</p>
+
+<script>
+const pad = document.getElementById("pad");
+const cursor = document.getElementById("cursor");
+const message = document.getElementById("message");
+let x = 50, y = 50, last = null;
+
+function showCursor() {
+  cursor.style.left = x + "%";
+  cursor.style.top = y + "%";
+}
+pad.addEventListener("pointerdown", e => {
+  last = { x: e.clientX, y: e.clientY };
+  pad.setPointerCapture(e.pointerId);
+});
+pad.addEventListener("pointermove", e => {
+  if (!last) return;
+  const r = pad.getBoundingClientRect();
+  x = Math.max(2, Math.min(95,
+    x + (e.clientX - last.x) / r.width * 100));
+  y = Math.max(2, Math.min(95,
+    y + (e.clientY - last.y) / r.height * 100));
+  last = { x: e.clientX, y: e.clientY };
+  showCursor();
+});
+pad.addEventListener("pointerup", () => last = null);
+pad.addEventListener("pointercancel", () => last = null);
+
+document.getElementById("left").onclick =
+  () => message.textContent = "Demo: left click pressed";
+document.getElementById("right").onclick =
+  () => message.textContent = "Demo: right click pressed";
+document.getElementById("back").onclick =
+  () => message.textContent = "Demo: Back pressed";
+document.getElementById("home").onclick =
+  () => message.textContent = "Demo: Home pressed";
+document.getElementById("typing").onchange =
+  e => message.textContent = "Demo text: " + e.target.value;
+</script>
+</body>
+</html>
